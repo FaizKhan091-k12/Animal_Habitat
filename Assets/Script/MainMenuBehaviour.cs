@@ -8,6 +8,12 @@ public class MainMenuBehaviour : MonoBehaviour
     [Header("References")] [SerializeField]
     private TypewriterTMP typewriterTMP;
 
+    [Header("Sounds Settings")]
+    [SerializeField] private bool isMute;
+
+    [SerializeField] private GameObject mute;
+    [SerializeField] GameObject unMute;
+
     [Header("Extras")] [SerializeField] private Transform sunrays;
     [SerializeField] float sunRaysRotationSpeed;
 
@@ -27,17 +33,64 @@ public class MainMenuBehaviour : MonoBehaviour
     [Header("Fish Level")]
     [SerializeField] private Transform fishLevels;
 
+    [SerializeField] private GameObject clouds;
+    [SerializeField] private Transform fish;
+    [SerializeField] private Transform cluesBoard,question_Board;
+    [SerializeField] private Transform water_Btn, desert_Btn, forest_Btn;
+    [SerializeField] private Transform fish_Video;
+
+    
+    [Header("Camel Level")]
+    [SerializeField] private Transform camelLevels;
+
+    [SerializeField] private GameObject camel_clouds;
+    [SerializeField] private Transform camel;
+    [SerializeField] private Transform camel_cluesBoard,camel_question_Board;
+    [SerializeField] private Transform camel_water_Btn, camel_desert_Btn, camel_forest_Btn;
+    [SerializeField] private Transform camel_Video;
+
+
+
+
     private void Start()
     {
         playBtn.localScale = Vector3.zero;
         level1.localScale = Vector3.zero;
         monkey_Mascot.localScale = Vector3.zero;
         dialogue_Panel.localScale = Vector3.zero;
+        fishLevels.localScale = Vector3.zero;
+        camelLevels.localScale = Vector3.zero;
+        camel_clouds.SetActive(false);
+        clouds.SetActive(false);
+        
+        //Fish Level
+        
+        fish.localScale = Vector3.zero;
+        cluesBoard.localScale = Vector3.zero;
+        question_Board.localScale = Vector3.zero;
+        water_Btn.localScale = Vector3.zero;
+        desert_Btn.localScale = Vector3.zero;
+        forest_Btn.localScale = Vector3.zero;
+        fish_Video.localScale = Vector3.zero;
+   
+        
+        // Camel
+        
+        camel.localScale = Vector3.zero;
+        camel_cluesBoard.localScale = Vector3.zero;
+        camel_question_Board.localScale = Vector3.zero;
+        camel_water_Btn.localScale = Vector3.zero;
+        camel_desert_Btn.localScale = Vector3.zero;
+        camel_forest_Btn.localScale = Vector3.zero;
+        camel_Video.localScale = Vector3.zero;
+      
+        
         foreach (Transform element in tittleBoardElements)
         {
             element.localScale = Vector3.zero;
         }
 
+        IsMuted();
         // tittleBoardAnim.enabled = false;
         StartCoroutine(InitializeTittleBoard());
     }
@@ -45,6 +98,28 @@ public class MainMenuBehaviour : MonoBehaviour
     private void Update()
     {
         sunrays.Rotate(0, 0, sunRaysRotationSpeed * Time.deltaTime);
+    }
+
+    public void IsMuted()
+    {
+        isMute = !isMute;
+        if (isMute)
+        {
+            AudioManager.instance.audioSourceBG.volume = 0f;
+            AudioManager.instance.audioSourceClip.volume = 0f;
+            mute.transform.localScale = Vector3.zero;
+            unMute.transform.localScale = Vector3.zero;
+            mute.transform.DOScale(Vector3.one, .01f).SetEase(Ease.OutBack);
+            
+        }
+        else
+        {
+            AudioManager.instance.audioSourceBG.volume = 1f;
+            AudioManager.instance.audioSourceClip.volume = 1f;
+            mute.transform.localScale = Vector3.zero;
+            unMute.transform.localScale = Vector3.zero;
+            unMute.transform.DOScale(Vector3.one, .01f).SetEase(Ease.OutBack);
+        }
     }
 
     IEnumerator InitializeTittleBoard()
@@ -105,4 +180,106 @@ public class MainMenuBehaviour : MonoBehaviour
     {
         instructions.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
     }
+
+    public void ContinueBtnClicked()
+    {
+        fishLevels.transform.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+        Invoke(nameof(ActivateClouds),.1f);
+    }
+
+    void ActivateClouds()
+    {
+        clouds.SetActive(true);
+        Invoke(nameof(FishActivate),.2f);
+    }
+
+    #region FishLevel
+
+    void FishActivate()
+    {
+        fish.DOScale(Vector3.one,.5f).SetEase(Ease.OutBack);
+        Invoke(nameof(ClueBoardActivate),.2f);
+    }
+
+    void ClueBoardActivate()
+    {
+        cluesBoard.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+        question_Board.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+        Invoke(nameof(Water),.25f);
+    }
+
+    void Water()
+    {
+        water_Btn.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+        Invoke(nameof(Desert),.25f);
+    }
+
+    void Desert()
+    {
+        desert_Btn.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+        Invoke(nameof(Forest),.25f);
+    }
+
+    void Forest()
+    {
+        forest_Btn.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+        water_Btn.GetComponent<UIHoverClickEffect>().enableIdlePulse = true;
+        desert_Btn.GetComponent<UIHoverClickEffect>().enableIdlePulse = true;
+        forest_Btn.GetComponent<UIHoverClickEffect>().enableIdlePulse = true;
+        AudioManager.instance.PlayWhereThisAnimalLive();    
+    }
+
+    public void FishVideo()
+    {
+    
+        fish_Video.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+    }
+
+    #endregion
+    
+    #region CamelLevel
+
+    public void CamelActivate()
+    {
+        camelLevels.DOScale(Vector3.one,.5f).SetEase(Ease.OutBack);
+        camel_clouds.SetActive(true);
+        Invoke(nameof(CamelClueBoardActivate),.2f);
+    }
+
+    void CamelClueBoardActivate()
+    {
+        camel.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+        camel_cluesBoard.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+        camel_question_Board.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+        Invoke(nameof(CamelWater),.25f);
+    }
+
+    void CamelWater()
+    {
+        camel_water_Btn.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+        Invoke(nameof(CamelDesert),.25f);
+    }
+
+    void CamelDesert()
+    {
+        camel_desert_Btn.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+        Invoke(nameof(CamelForest),.25f);
+    }
+
+    void CamelForest()
+    {
+        camel_forest_Btn.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+        camel_water_Btn.GetComponent<UIHoverClickEffect>().enableIdlePulse = true;
+        camel_desert_Btn.GetComponent<UIHoverClickEffect>().enableIdlePulse = true;
+        camel_forest_Btn.GetComponent<UIHoverClickEffect>().enableIdlePulse = true;
+        AudioManager.instance.PlayWhereThisAnimalLive();    
+    }
+
+    public void CamelVideo()
+    {
+
+        camel_Video.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
+    }
+
+    #endregion
 }

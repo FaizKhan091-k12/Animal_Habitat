@@ -4,10 +4,11 @@ using UnityEngine;
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance;
-    [SerializeField] private AudioSource audioSourceBG;
-    [SerializeField] private AudioSource  audioSourceClip;
+    [SerializeField] public AudioSource audioSourceBG;
+    [SerializeField] public AudioSource  audioSourceClip;
     [SerializeField] AudioClip dialogueClipOne;
     [SerializeField] AudioClip dialogueClipTwo;
+    [SerializeField] private AudioClip whereThisAnimalLive_Clip;
 
 
     private void Awake()
@@ -23,5 +24,10 @@ public class AudioManager : MonoBehaviour
     public void PlayDialogueTwo()
     {
         audioSourceClip.PlayOneShot(dialogueClipTwo);
+    }
+
+    public void PlayWhereThisAnimalLive()
+    {
+        audioSourceClip.PlayOneShot(whereThisAnimalLive_Clip);
     }
 }

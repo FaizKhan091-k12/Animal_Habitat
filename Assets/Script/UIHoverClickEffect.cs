@@ -4,10 +4,6 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-/// <summary>
-/// Smooth hover, click pulse, and optional idle pulse effect for UI elements.
-/// Works with Image, Button, Toggle, etc.
-/// </summary>
 [RequireComponent(typeof(RectTransform))]
 public class UIHoverClickEffect : MonoBehaviour,
     IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
@@ -27,23 +23,39 @@ public class UIHoverClickEffect : MonoBehaviour,
     public float idleScale = 1.05f;
     public float idleSpeed = 1.5f;
 
+    [Header("Answer Feedback Settings")]
+    public bool enableAnswerFeedback = false;
+    public bool isCorrect = false;
+    public bool isWrong = false;
+
+    public float blinkDuration = 0.5f;
+    public int blinkCount = 2;
+    public Color correctColor = Color.green;
+    public Color wrongColor = Color.red;
+
     [Header("Events (Optional)")]
     public UnityEvent onHoverEnter;
     public UnityEvent onHoverExit;
     public UnityEvent onClick;
 
-    // Internals
     RectTransform rt;
     Vector3 baseScale;
     Coroutine scaleCoroutine;
+    Coroutine blinkCoroutine;
     bool isHovered = false;
     Selectable selectableComponent;
+    Graphic graphicComponent;
+    Color originalColor;
 
     void Awake()
     {
         rt = GetComponent<RectTransform>();
         baseScale = rt.localScale;
         selectableComponent = GetComponent<Selectable>();
+        graphicComponent = GetComponent<Graphic>();
+
+        if (graphicComponent != null)
+            originalColor = graphicComponent.color;
     }
 
     bool IsInteractable()
@@ -53,11 +65,6 @@ public class UIHoverClickEffect : MonoBehaviour,
 
     void Update()
     {
-        // Idle pulse only when:
-        // - Enabled
-        // - Interactable
-        // - Not hovered
-        // - Not currently running other animation
         if (!enableIdlePulse) return;
         if (!IsInteractable()) return;
         if (isHovered) return;
@@ -104,6 +111,41 @@ public class UIHoverClickEffect : MonoBehaviour,
 
         StopScaleCoroutine();
         scaleCoroutine = StartCoroutine(ClickPulseCoroutine());
+
+        // Answer Feedback Logic
+        if (enableAnswerFeedback)
+        {
+            if (blinkCoroutine != null)
+                StopCoroutine(blinkCoroutine);
+
+            blinkCoroutine = StartCoroutine(BlinkFeedback());
+        }
+    }
+
+    IEnumerator BlinkFeedback()
+    {
+        if (graphicComponent == null)
+            yield break;
+
+        Color targetColor = originalColor;
+
+        if (isCorrect)
+            targetColor = correctColor;
+        else if (isWrong)
+            targetColor = wrongColor;
+
+        float half = blinkDuration / (blinkCount * 2f);
+
+        for (int i = 0; i < blinkCount; i++)
+        {
+            graphicComponent.color = targetColor;
+            yield return new WaitForSecondsRealtime(half);
+
+            graphicComponent.color = originalColor;
+            yield return new WaitForSecondsRealtime(half);
+        }
+
+        graphicComponent.color = originalColor;
     }
 
     void StopScaleCoroutine()
@@ -144,23 +186,17 @@ public class UIHoverClickEffect : MonoBehaviour,
         Vector3 start = rt.localScale;
         Vector3 peak = start * clickScale;
         float half = clickDuration * 0.5f;
-
         float t = 0f;
 
-        // Scale Up
         while (t < half)
         {
             t += (useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
             float f = Mathf.Clamp01(t / half);
             float eased = Mathf.SmoothStep(0f, 1f, f);
-
             rt.localScale = Vector3.LerpUnclamped(start, peak, eased);
             yield return null;
         }
 
-        rt.localScale = peak;
-
-        // Scale Back
         Vector3 returnTarget = isHovered ? baseScale * hoverScale : baseScale;
         t = 0f;
 
@@ -169,7 +205,6 @@ public class UIHoverClickEffect : MonoBehaviour,
             t += (useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
             float f = Mathf.Clamp01(t / half);
             float eased = Mathf.SmoothStep(0f, 1f, f);
-
             rt.localScale = Vector3.LerpUnclamped(peak, returnTarget, eased);
             yield return null;
         }
@@ -178,7 +213,6 @@ public class UIHoverClickEffect : MonoBehaviour,
         scaleCoroutine = null;
     }
 
-    // Optional: Call this if parent scale changes dynamically
     public void ResetBaseScaleToCurrent()
     {
         baseScale = rt.localScale;
