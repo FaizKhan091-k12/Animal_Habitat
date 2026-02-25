@@ -9,6 +9,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] AudioClip dialogueClipOne;
     [SerializeField] AudioClip dialogueClipTwo;
     [SerializeField] private AudioClip whereThisAnimalLive_Clip;
+    [SerializeField] private AudioClip wellDone;
 
 
     private void Awake()
@@ -29,5 +30,10 @@ public class AudioManager : MonoBehaviour
     public void PlayWhereThisAnimalLive()
     {
         audioSourceClip.PlayOneShot(whereThisAnimalLive_Clip);
+    }
+
+    public void PlayWellDone()
+    {
+        audioSourceClip.PlayOneShot(wellDone);
     }
 }
