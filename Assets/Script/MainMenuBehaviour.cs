@@ -182,7 +182,7 @@ gif_NextBtn.SetActive(false);
         }
         else
         {
-            AudioManager.instance.audioSourceBG.volume = .5f;
+            AudioManager.instance.audioSourceBG.volume = 0.08f;
             AudioManager.instance.audioSourceClip.volume = 1f;
             mute.transform.localScale = Vector3.zero;
             unMute.transform.localScale = Vector3.zero;

@@ -19017,7 +19017,7 @@ MonoBehaviour:
   clickScale: 1.15
   clickDuration: 0.18
   clickAlwaysPlays: 0
-  enableIdlePulse: 0
+  enableIdlePulse: 1
   idleScale: 1.05
   idleSpeed: 1.5
   enableAnswerFeedback: 0
