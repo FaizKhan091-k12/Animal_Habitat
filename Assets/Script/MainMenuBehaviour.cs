@@ -182,7 +182,7 @@ gif_NextBtn.SetActive(false);
         }
         else
         {
-            AudioManager.instance.audioSourceBG.volume = 0.08f;
+            AudioManager.instance.audioSourceBG.volume = 0.03f;
             AudioManager.instance.audioSourceClip.volume = 1f;
             mute.transform.localScale = Vector3.zero;
             unMute.transform.localScale = Vector3.zero;
@@ -352,7 +352,7 @@ gif_NextBtn.SetActive(false);
     {
 
         camel_Video.DOScale(Vector3.one, .5f).SetEase(Ease.OutBack);
-        Invoke(nameof(CamelNextBtn),2f);
+        Invoke(nameof(CamelNextBtn),5f);
     }
 
     private void CamelNextBtn()
